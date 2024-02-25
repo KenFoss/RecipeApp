@@ -1,6 +1,7 @@
 import {useEffect, useState, useRef, createRef} from 'react';
 import NavBar from '../components/Nav.js'
 import { useNavigate } from 'react-router-dom';
+import '../styling/Recipes.css'
 // import { getSearchParamsForLocation } from 'react-router-dom/dist/dom.js';
 
 const SearchParamsComponent = ({searchParams, setSearchParams}) => {
@@ -23,7 +24,7 @@ const SearchResultsComponent = ({searchResults}) => {
   return (
     searchResults.map( (x) => {
       return(
-        <div key={`recipe-${x['id']}`}>
+        <div className = 'recipe-item' key={`recipe-${x['id']}`}>
           <h3>{x['title']}</h3>
           {/* <a href ={ `/recipe-info/${x['id']}`}>
             <img src={x['image']} alt={`Picture of ${x['title']} Recipe`} />
@@ -97,7 +98,10 @@ function Recipes () {
         <button key="searchButton" onClick={() => searchRecipes()} type="button">Search</button>
       </div>
 
-      <SearchResultsComponent searchResults={searchResults} />
+      <SearchResultsComponent 
+        className = 'search-results-component'
+        searchResults={searchResults} 
+      />
 
     </div>
   )

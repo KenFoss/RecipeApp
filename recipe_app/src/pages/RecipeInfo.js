@@ -1,6 +1,49 @@
 import {useParams} from 'react-router-dom';
 import {useEffect, useState} from 'react';
 import NavBar from '../components/Nav';
+import useLocalStorage from '../hooks/useLocalStorage';
+
+const Ingrediants = ({recipeData}) => {
+  const IngrediantList = () => {
+    return( 
+      <ul>
+        {recipeData['extendedIngredients'].map( (x) =>
+          { return (
+              <li key={x['id']}>
+                {x['original']}
+              </li>
+            )
+          }        
+        )}
+      </ul>
+    )
+  }
+
+  return( 
+    'extendedIngredients' in recipeData && <IngrediantList/>
+  )
+}
+
+const addToPlanner = ({recipeData}) => {
+  let day = '';
+  
+  const handleClick = (event) => {
+    day = event.target.value;
+  }
+
+  return (
+    <div>
+      <select onClick={(event) => handleClick(event)}>
+        <option value = ''>Select Day</option>
+        <option value = 'monday'> Monday </option>
+        <option value = 'tuesday'> Tuesday </option>
+        <option value = 'wednesday'> Wednesday</option>
+        <option value = 'thursday'> Thursday </option>
+      </select>
+    </div>
+  )
+}
+
 
 function RecipeInfo() {
 
@@ -43,6 +86,7 @@ function RecipeInfo() {
               <h1> {recipeData['title']} </h1>
               <img src={recipeData['image']}/>
               <body> {recipeData['instructions']}</body>
+              <Ingrediants recipeData={recipeData} />
             </div>
           )
         }
