@@ -1,0 +1,176 @@
+/* .App {
+  text-align: center;
+} */
+
+.App-logo {
+  height: 40vmin;
+  pointer-events: none;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .App-logo {
+    animation: App-logo-spin infinite 20s linear;
+  }
+}
+
+.App-header {
+  background-color: #282c34;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-size: calc(10px + 2vmin);
+  color: black;
+}
+
+a {
+  color: blue;
+}
+
+@keyframes App-logo-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+
+body {
+  background-color: lightblue;
+}
+
+.nav-bar {
+  display:flex;
+  flex-direction: row;
+  justify-content:center;
+  align-items: center;
+  background-color: black;
+  height: 7vh;
+  overflow: hidden;
+}
+
+.nav-bar a {
+  margin-right: 2vw;
+  margin-left: 2vw;
+  text-decoration: none;
+  color: white;
+}
+
+.search-controls {
+  display: flex;
+  flex-direction: column;
+  width: 40vw;
+  margin-left:30vw;
+  align-items: center;
+}
+
+.search-controls div{
+  display:flex;
+  justify-content: center;
+}
+
+.recipe-item img:hover{
+  cursor:pointer;
+}
+
+.search-controls button{
+  cursor:pointer;
+}
+
+
+.search-results-component {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px; /* Add gap between items */
+  margin-top:35px;
+}
+
+.search-results-component h3{
+  text-align:center;
+  width: 150px;
+  margin-right: 10px;
+}
+
+.recipe-item {
+  display: flex;
+  flex-direction: row;
+  justify-content:center;
+  margin-top:10px;
+}
+
+.recipe-item img:hover{
+  cursor:pointer;
+}
+
+.search-param-instance {
+  height: 4vh;
+  width:100%;
+  margin-bottom: 10px;
+  height: 30px;
+}
+
+.search-param-instance label {
+  width: 150px;
+  overflow:auto;
+}
+
+.search-param-instance input{
+  margin-left: 10%;
+  width: 40%;
+  height: 17px;
+}
+
+.recipe-search-box {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  position:relative;
+  width: 100%;
+}
+.recipe-search-box button{
+  position:absolute;
+  width : 55px;
+}
+
+.recipe-search-box div {
+  margin-left: 225px;
+  font-size:10px;
+}
+
+.planner-container {
+  display:grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 20px;
+  overflow:auto;
+}
+
+.planned-meal-item{
+  display: flex;
+  flex-direction: column;
+  margin-left:4px;
+  border: 1px solid black;
+  margin-top: 5px;
+}
+
+.planned-meal-item label{
+  font-size:32px;
+  font-weight:bold;
+  text-align:center;
+  margin-top:5px;
+}
+
+.planned-meal-item p{
+  font-size:14px;
+  text-align:left;
+  margin-left: 10px;
+}
+
+.planned-meal-item h2{
+  font-size:18px;
+  text-align:left;
+  font-weight:bold;
+  margin-left: 10px;
+}
