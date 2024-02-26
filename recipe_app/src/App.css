@@ -136,8 +136,11 @@ body {
 }
 
 .recipe-search-box div {
-  margin-left: 225px;
+  margin-left: 60%;
   font-size:10px;
+  color: darkred;
+  font-weight:bold;
+  font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
 }
 
 .planner-container {
