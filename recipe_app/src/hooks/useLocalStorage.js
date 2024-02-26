@@ -1,22 +1,22 @@
-import {useState} from 'react';
+import {useState, useEffect} from 'react';
 
-const useLocalStorage = ({itemKey}) => {
-    const [data, setData] = useState();
+const useLocalStorage = ({ itemKey, defaultData }) => {
+  // Initialize state using a function to read from local storage
+  const [data, setData] = useState(() => {
+      const storedData = localStorage.getItem(itemKey);
+      if (storedData) {
+        return JSON.parse(storedData)
+      } else {
+        localStorage.setItem(itemKey, JSON.stringify(defaultData));
+        return defaultData
+      } 
+  });
 
+  useEffect(() => {
+    localStorage.setItem(itemKey, JSON.stringify(data));
+  }, [data, itemKey]);
 
-    // on instantiation of object check if data in localstorage
-    
-    if(localStorage.getItem(itemKey) !== null) {
-        console.log(localStorage.getItem(itemKey))
-        setData(JSON.parse(localStorage.get(itemKey)));
-    }
-
-    const setLocalStorage = (itemValue) => {
-        setData(itemValue);
-        localStorage.setItem(itemKey, JSON.stringify(itemValue));
-    }
-
-    return[data, setLocalStorage];
+  return [data, setData];
 }
 
 export default useLocalStorage;
