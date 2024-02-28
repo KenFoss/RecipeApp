@@ -24,9 +24,6 @@ const SearchResultsComponent = ({searchResults}) => {
 
   const handleImgHover = (e, id) => {
     if (e.type=='mouseenter'){
-      console.log('enter')
-      console.log(id)
-      console.log(imgHover)
       setImgHover( () => {
           if(id in imgHover){
             return (
@@ -48,7 +45,6 @@ const SearchResultsComponent = ({searchResults}) => {
         }
       );
     } else if (e.type='mouseleave') {
-      // setImgHover(false);
       setImgHover( () => {
         if(id in imgHover){
           return (
@@ -75,8 +71,6 @@ const SearchResultsComponent = ({searchResults}) => {
   return (
     <div className='search-results-component'>
     {  searchResults.map( (x) => {
-      console.log(x['id'])
-      console.log(`recipe-img-containter-${imgHover[x['id']] ? 'hover' : 'norm'}`)
         return(
           <div className = 'recipe-item' key={`recipe-${x['id']}`}>
             <div className = {`recipe-img-containter-${imgHover[x['id']] ? 'hover' : 'norm'}`} onMouseEnter={(e) => {handleImgHover(e, x['id'])}} onMouseLeave={(e) => {handleImgHover(e, x['id'])}}>
