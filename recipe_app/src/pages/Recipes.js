@@ -19,18 +19,70 @@ const SearchParamsComponent = ({searchParams, setSearchParams}) => {
 }
 
 const SearchResultsComponent = ({searchResults}) => {
+  const [imgHover, setImgHover] = useState({});
   let navigate = useNavigate();
+
+  const handleImgHover = (e, id) => {
+    if (e.type=='mouseenter'){
+      console.log('enter')
+      console.log(id)
+      console.log(imgHover)
+      setImgHover( () => {
+          if(id in imgHover){
+            return (
+              Object.entries(imgHover).reduce( (acc, [key, value]) => {
+                if(acc[key] == id) {
+                  acc[key] = true;
+                }
+                return acc;
+              }, {} )
+            )
+          } else {
+            return (
+              {
+                ...imgHover,
+                [id]:true
+              }
+            )
+          }
+        }
+      );
+    } else if (e.type='mouseleave') {
+      // setImgHover(false);
+      setImgHover( () => {
+        if(id in imgHover){
+          return (
+            Object.entries(imgHover).reduce( (acc, [key, value]) => {
+              if(acc[key] == id) {
+                acc[key] = false;
+              }
+              return acc;
+            }, {} )
+          )
+        } else {
+          return (
+            {
+              ...imgHover,
+              [id]:false
+            }
+          )
+        }
+      }
+    );
+    }
+  }
 
   return (
     <div className='search-results-component'>
     {  searchResults.map( (x) => {
+      console.log(x['id'])
+      console.log(`recipe-img-containter-${imgHover[x['id']] ? 'hover' : 'norm'}`)
         return(
           <div className = 'recipe-item' key={`recipe-${x['id']}`}>
+            <div className = {`recipe-img-containter-${imgHover[x['id']] ? 'hover' : 'norm'}`} onMouseEnter={(e) => {handleImgHover(e, x['id'])}} onMouseLeave={(e) => {handleImgHover(e, x['id'])}}>
+              <img src={x['image']} onClick={() => navigate(`/recipe-info/${x['id']}`)} alt={`Picture of ${x['title']} Recipe`} />
+            </div>
             <h3>{x['title']}</h3>
-            {/* <a href ={ `/recipe-info/${x['id']}`}>
-              <img src={x['image']} alt={`Picture of ${x['title']} Recipe`} />
-            </a> */}
-            <img src={x['image']} onClick={() => navigate(`/recipe-info/${x['id']}`)} alt={`Picture of ${x['title']} Recipe`} />
           </div>
         )
       })}
