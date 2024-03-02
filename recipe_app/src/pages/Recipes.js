@@ -279,7 +279,7 @@ function Recipes () {
   // This listenere will assess when the user has scrolled to the bottom of the page
   useEffect(() => {
     const handleScroll = () => {
-      if (window.innerHeight + document.documentElement.scrollTop >= document.documentElement.offsetHeight - 500) {
+      if (window.innerHeight + document.documentElement.scrollTop == document.documentElement.offsetHeight) {
         // THIS IS IMPORTANT: Basically telling react that prevPage is the most recent version of page (can call it whatever you want)
         // Look into what is happening when directly settiung to page+1
         setPage(prevPage => prevPage + 1);
