@@ -4,83 +4,16 @@ import { useNavigate } from 'react-router-dom';
 import { getAllByRole } from '@testing-library/react';
 // import { getSearchParamsForLocation } from 'react-router-dom/dist/dom.js';
 
-const SearchParamsComponent = ({searchParams, setSearchParams}) => {
+const SearchParamsComponent = ({searchParams}) => {
   return(
-    // <div>
       Object.entries(searchParams).map( ([key, value]) => {
         return(
           <div key = {`${key}-div`} className='search-param-instance'>
-            <label key={`${key}-label`}>{key == 'includeIngrediants' ? 'Include Ingrediants:' : 'Exclude Ingrediants:'}</label>
+            <label key={`${key}-label`}>{key == 'includeIngredients' ? 'Include Ingrediants:' : 'Exclude Ingrediants:'}</label>
             <input key={`${key}-input`} ref={value} />
           </div>
         )
       })
-  )
-}
-
-const SearchResultsComponent = ({searchResults}) => {
-  const [imgHover, setImgHover] = useState({});
-  let navigate = useNavigate();
-
-  const handleImgHover = (e, id) => {
-    if (e.type=='mouseenter'){
-      setImgHover( () => {
-          if(id in imgHover){
-            return (
-              Object.entries(imgHover).reduce( (acc, [key, value]) => {
-                if(acc[key] == id) {
-                  acc[key] = true;
-                }
-                return acc;
-              }, {} )
-            )
-          } else {
-            return (
-              {
-                ...imgHover,
-                [id]:true
-              }
-            )
-          }
-        }
-      );
-    } else if (e.type='mouseleave') {
-      setImgHover( () => {
-        if(id in imgHover){
-          return (
-            Object.entries(imgHover).reduce( (acc, [key, value]) => {
-              if(acc[key] == id) {
-                acc[key] = false;
-              }
-              return acc;
-            }, {} )
-          )
-        } else {
-          return (
-            {
-              ...imgHover,
-              [id]:false
-            }
-          )
-        }
-      }
-    );
-    }
-  }
-
-  return (
-    <div className='search-results-component'>
-    {  searchResults.map( (x) => {
-        return(
-          <div className = 'recipe-item' key={`recipe-${x['id']}`}>
-            <div className = {`recipe-img-containter-${imgHover[x['id']] ? 'hover' : 'norm'}`} onMouseEnter={(e) => {handleImgHover(e, x['id'])}} onMouseLeave={(e) => {handleImgHover(e, x['id'])}}>
-              <img src={x['image']} onClick={() => navigate(`/recipe-info/${x['id']}`)} alt={`Picture of ${x['title']} Recipe`} />
-            </div>
-            <h3>{x['title']}</h3>
-          </div>
-        )
-      })}
-  </div>
   )
 }
 
@@ -95,9 +28,14 @@ const SearchAlertComponent = ({showSearchAlert, alertMessage}) => {
 
 function Recipes () {
 
-  const [searchParams, setSearchParams] = useState({
-    'includeIngrediants' : createRef(''),
-    'excludeIngrediants' : createRef('')
+  let searchParams = {
+    'includeIngredients' : createRef(''),
+    'excludeIngredients' : createRef('')
+  };
+
+  const [currentSearchParams, setCurrentSearchParams] = useState({
+    'includeIngredients' : createRef(''),
+    'excludeIngredients' : createRef('')
   });
 
   const [searchResults, setSearchResults] = useState([
@@ -166,10 +104,78 @@ function Recipes () {
   const [alertMessage, setAlertMessage] = useState('Unknown issue, unable to search for recipes');
   const [showSearchAlert, setShowSearchAlert] = useState(false);
   const [triggerRateLimit, setTriggerRateLimit] = useState(false);
+  const [page, setPage] = useState(1);
 
   let x_rateLimitAPI_key = process.env.REACT_APP_AUTH_X_API_KEY
 
   // let x_rapidAPI_key = null;
+
+  // COMPONENTS 
+  const SearchResultsComponent = () => {
+    const [imgHover, setImgHover] = useState({});
+    let navigate = useNavigate();
+  
+    const handleImgHover = (e, id) => {
+      if (e.type=='mouseenter'){
+        setImgHover( () => {
+            if(id in imgHover){
+              return (
+                Object.entries(imgHover).reduce( (acc, [key, value]) => {
+                  if(acc[key] == id) {
+                    acc[key] = true;
+                  }
+                  return acc;
+                }, {} )
+              )
+            } else {
+              return (
+                {
+                  ...imgHover,
+                  [id]:true
+                }
+              )
+            }
+          }
+        );
+      } else if (e.type='mouseleave') {
+        setImgHover( () => {
+          if(id in imgHover){
+            return (
+              Object.entries(imgHover).reduce( (acc, [key, value]) => {
+                if(acc[key] == id) {
+                  acc[key] = false;
+                }
+                return acc;
+              }, {} )
+            )
+          } else {
+            return (
+              {
+                ...imgHover,
+                [id]:false
+              }
+            )
+          }
+        }
+      );
+      }
+    }
+  
+    return (
+      <div className='search-results-component'>
+      {  searchResults.map( (x) => {
+          return(
+            <div className = 'recipe-item' key={`recipe-${x['id']}`}>
+              <div className = {`recipe-img-containter-${imgHover[x['id']] ? 'hover' : 'norm'}`} onMouseEnter={(e) => {handleImgHover(e, x['id'])}} onMouseLeave={(e) => {handleImgHover(e, x['id'])}}>
+                <img src={x['image']} onClick={() => navigate(`/recipe-info/${x['id']}`)} alt={`Picture of ${x['title']} Recipe`} />
+              </div>
+              <h3>{x['title']}</h3>
+            </div>
+          )
+        })}
+    </div>
+    )
+  }
 
 
   // METHODS
@@ -200,51 +206,18 @@ function Recipes () {
   // set alert message based on contents of api response, 
 
   const searchRecipes = async() => {
-    let includeIngrediants = searchParams['includeIngrediants'].current.value.split(',');
-    let excludeIngrediants = searchParams['excludeIngrediants'].current.value.split(',');
 
-    // We cannot call the api without a key, 
-    if(XRapidAPIKey == null) {
-      return;
-    }
+    setSearchResults([]);
 
-    // Eliminate white space
-    includeIngrediants = includeIngrediants.map( (x) => {
-      return x.trim();
-    });
+    setCurrentSearchParams({
+      "includeIngredients" : searchParams['includeIngredients'].current.value.split(',').reduce((acc, x) => {
+        return (acc + x.trim() + ',');
+      }, ''),
+      "excludeIngredients" : searchParams['excludeIngredients'].current.value.split(',').reduce((acc, x) => {
+        return (acc + x.trim() + ',');
+      }, '')
+     })
 
-    excludeIngrediants = excludeIngrediants.map( (x) => {
-      return x.trim();
-    });
-
-    // recombine without spaces
-    includeIngrediants = includeIngrediants.reduce((acc, x) => {
-      return (acc + x + ',');
-    }, '')
-
-    excludeIngrediants = excludeIngrediants.reduce((acc, x) => {
-      return (acc + x + ',');
-    }, '')
-
-    const url = `https://spoonacular-recipe-food-nutrition-v1.p.rapidapi.com/recipes/complexSearch?includeIngredients=${includeIngrediants}&excludeIngrediants=${excludeIngrediants}&number=10`;
-    const options = {
-      method: 'GET',
-      headers: {
-        'X-RapidAPI-Key': XRapidAPIKey,
-        'X-RapidAPI-Host': 'spoonacular-recipe-food-nutrition-v1.p.rapidapi.com'
-      }
-    };
-
-    // increment the rate limit counter
-    setTriggerRateLimit(!triggerRateLimit);
-
-    try {
-      const response = await fetch(url, options);
-      const result = await response.json();
-      setSearchResults(result['results'])
-    } catch (error) {
-      console.error(error);
-    }
   }
 
   // ON RENDER
@@ -266,6 +239,61 @@ function Recipes () {
     fetchData();
   },[triggerRateLimit])
 
+  // fetch recipe data
+  useEffect(() => {
+    
+    const fetchData = async(key) => {
+      // With no api key we cannot search
+      if(key == null) {
+        return;
+      }
+
+      let url = `https://spoonacular-recipe-food-nutrition-v1.p.rapidapi.com/recipes/complexSearch?includeIngredients=${currentSearchParams['includeIngredients']}&excludeIngredients=${currentSearchParams['excludeIngredients']}&number=20&offset=${page*20}`;
+      let options = {
+        method: 'GET',
+        headers: {
+          'X-RapidAPI-Key': key,
+          'X-RapidAPI-Host': 'spoonacular-recipe-food-nutrition-v1.p.rapidapi.com'
+        }
+      };
+
+      // Get the response data
+
+      try {
+        const response = await fetch(url, options);
+        const result = await response.json();
+        setSearchResults([...searchResults, ...result['results']])
+      } catch (error) {
+        console.error(error);
+      }
+    }
+
+    fetchData(XRapidAPIKey);
+
+    // increment the rate limit counter, do this after the request is sent as this can change the XRapidAPIKey to null
+    setTriggerRateLimit(!triggerRateLimit);
+  }, [currentSearchParams, page])
+
+  // LISTENERS
+
+  // This listenere will assess when the user has scrolled to the bottom of the page
+  useEffect(() => {
+    const handleScroll = () => {
+      if (window.innerHeight + document.documentElement.scrollTop >= document.documentElement.offsetHeight - 500) {
+        // THIS IS IMPORTANT: Basically telling react that prevPage is the most recent version of page (can call it whatever you want)
+        // Look into what is happening when directly settiung to page+1
+        setPage(prevPage => prevPage + 1);
+      }
+    }
+  
+    window.addEventListener('scroll', handleScroll);
+  
+    // Clean up the event listener to avoid memory leaks
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+    };
+  }, []);
+
   // RESPONSE BODY/JSX
 
   return (
@@ -275,7 +303,7 @@ function Recipes () {
       <div className='search-controls'>
         <h1> Browse Our Recipes! </h1>
 
-        <SearchParamsComponent key = 'search-params-component' searchParams={searchParams} setSearchParams={setSearchParams}/>
+        <SearchParamsComponent key = 'search-params-component' searchParams={searchParams}/>
          {/* Cannot search without rapid api key, do not render the button until this is gathered */}
          <div className='recipe-search-box'>
           <button key="searchButton" onClick={() => searchRecipes()} onMouseEnter={() => handleShowSearchAlert('enter')} onMouseLeave={() => handleShowSearchAlert('leave')} type="button">Search</button> 
@@ -286,7 +314,6 @@ function Recipes () {
 
       {/* Cannot search without rapid api key, do not render the button until this is gathered */}
       <SearchResultsComponent 
-        searchResults={searchResults} 
       />
 
     </div>
