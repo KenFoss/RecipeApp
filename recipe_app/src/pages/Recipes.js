@@ -105,6 +105,8 @@ function Recipes () {
   const [showSearchAlert, setShowSearchAlert] = useState(false);
   const [triggerRateLimit, setTriggerRateLimit] = useState(false);
   const [page, setPage] = useState(1);
+  // This is used to assure we don't continue to trigger a lazy load when past the given screen height
+  let awaitLazyLoad = false;
 
   let x_rateLimitAPI_key = process.env.REACT_APP_AUTH_X_API_KEY
 
@@ -262,7 +264,11 @@ function Recipes () {
       try {
         const response = await fetch(url, options);
         const result = await response.json();
+        console.log('searching')
         setSearchResults([...searchResults, ...result['results']])
+
+        // Once the new results are loaded we can re-set the lazy load flag 
+        awaitLazyLoad = false;
       } catch (error) {
         console.error(error);
       }
@@ -279,9 +285,10 @@ function Recipes () {
   // This listenere will assess when the user has scrolled to the bottom of the page
   useEffect(() => {
     const handleScroll = () => {
-      if (window.innerHeight + document.documentElement.scrollTop == document.documentElement.offsetHeight) {
+      if (window.innerHeight + document.documentElement.scrollTop >= document.documentElement.offsetHeight - 500 && awaitLazyLoad == false) {
         // THIS IS IMPORTANT: Basically telling react that prevPage is the most recent version of page (can call it whatever you want)
         // Look into what is happening when directly settiung to page+1
+        awaitLazyLoad = true;
         setPage(prevPage => prevPage + 1);
       }
     }
@@ -292,7 +299,10 @@ function Recipes () {
     return () => {
       window.removeEventListener('scroll', handleScroll);
     };
-  }, []);
+  }, [searchResults]);
+
+  useEffect(() => {console.log(searchResults)} ,[searchResults])
+  useEffect(() => {console.log(awaitLazyLoad)} ,[awaitLazyLoad])
 
   // RESPONSE BODY/JSX
 
